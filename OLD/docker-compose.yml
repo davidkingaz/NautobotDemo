@@ -1,0 +1,53 @@
+# docker-compose.yml
+version: "3.9"
+
+services:
+  nautobot:
+    build: .
+    container_name: nautobot
+    depends_on:
+      - db
+      - redis
+    environment:
+      - NAUTOBOT_DB_HOST=db
+      - NAUTOBOT_DB_NAME=nautobot
+      - NAUTOBOT_DB_USER=nautobot
+      - NAUTOBOT_DB_PASSWORD=${nautobot_pwd}
+      - NAUTOBOT_SECRET_KEY=${NAUTOBOT_SECRET_KEY}
+      - NAUTOBOT_ALLOWED_HOSTS=*
+      - 'NAUTOBOT_REDIS_URL=redis://redis:6379'
+    restart: unless-stopped
+
+  db:
+    image: postgres:13
+    container_name: db
+    environment:
+      - POSTGRES_USER=nautobot
+      - POSTGRES_PASSWORD=${postgres_pwd}
+      - POSTGRES_DB=nautobot
+    restart: unless-stopped
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+
+  redis:
+    image: 'redis:6-alpine'
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - 'redis-data:/data'
+
+  nginx:
+    image: nginx:latest
+    container_name: nginx
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+      - './static-files:/usr/share/nginx/html/static'
+    depends_on:
+      - nautobot
+    restart: unless-stopped
+
+volumes:
+  pg_data:
+  redis-data:
+  static-files:
