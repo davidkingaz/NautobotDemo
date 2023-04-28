@@ -7,14 +7,6 @@
 # Update the package index
 sudo apt-get update
 
-# Install git
-sudo apt-get install -y git
-
-# Install the required system packages
-sudo apt-get install -y python3 python3-dev python3-venv python3-pip build-essential libssl-dev libffi-dev libxml2-dev libxslt1-dev zlib1g-dev libpq-dev
-
-echo "Python installed successfully."
-
 # Install Docker
 sudo apt-get install -y apt-transport-https ca-certificates curl software-properties-common
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
@@ -41,6 +33,10 @@ sudo usermod -aG docker $(whoami)
 docker --version
 docker-compose --version
 
+echo "Pre-requisites Completed. Press ENTER to continue..."
+read
+
+echo "Resuming..."
 # Clone the repository
 git clone https://github.com/nautobot/nautobot-docker-compose.git
 
@@ -48,20 +44,22 @@ git clone https://github.com/nautobot/nautobot-docker-compose.git
 cd nautobot-docker-compose
 
 # Copy local.env.example to local.env
-cp local.env.example local.env
+#cp local.env.example local.env
 
 # Update the .env to be only available for the current user
-chmod 0600 local.env
+#chmod 0600 local.env
 
 # Run docker-compose up to start the environment
-docker-compose up -d
+#docker-compose up -d
 
 # Check if .gitignore file exists
 if [ ! -f .gitignore ]; then
     # Create a .gitignore file if it does not exist
     touch .gitignore
+fi
 
 # Check if 'local.env' is already in .gitignore
 if ! grep -q "local.env" .gitignore; then
     # Add 'local.env' to .gitignore
     echo "local.env" >> .gitignore
+fi
